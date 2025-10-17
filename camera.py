@@ -1,5 +1,6 @@
 from pyglm import glm
 
+from object.object import Object
 import ray
 import numpy as np
 from PIL import Image
@@ -42,17 +43,21 @@ class Camera:
         new_image = Image.fromarray(rgb_image)
         new_image.save('image.png')
 
-    def render_image(self):
+    def render_image(self, objects: list[Object]):
         print("Rendering ....")
         print(self.screen_height)
         print(self.screen_width)
         image = np.empty((int(self.screen_height), int(self.screen_width), 3), dtype=np.float32)
+        color = [0.0,0.0,0.0]
         for j in range(self.screen_height):
             for i in range(self.screen_width):
                 pixel_center = self.viewport_upper_left_center + (i * self.pixel_delta_u) + (j * self.pixel_delta_v)
                 ray_direction = pixel_center - self.position
                 r = ray.Ray(self.position, ray_direction)
                 color = (ray_direction + glm.vec3(1.0, 1.0, 1.0)) * 0.5
+                for o in objects:
+                    if o.hit(r):
+                        color = o.getColor()
                 image[j,i] = color
         
         self.save_image(image)

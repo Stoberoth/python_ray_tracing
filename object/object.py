@@ -10,3 +10,6 @@ class Object(ABC):
     def getColor(self):
         pass
     
+    @abstractmethod
+    def getNormal(self, point):
+        pass

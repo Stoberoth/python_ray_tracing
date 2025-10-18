@@ -8,11 +8,10 @@ class Ray:
         self.origin = origin
         self.dir = dir
 
-
-    def origin(self):
+    def get_origin(self):
         return self.origin
     
-    def dir(self):
+    def get_dir(self):
         return self.dir
     
     # get a point on the ray

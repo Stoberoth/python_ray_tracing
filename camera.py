@@ -1,6 +1,7 @@
 from random import randrange
 import random
 import sys
+from turtle import position
 from pyglm import glm
 
 from object.object import Object
@@ -16,42 +17,46 @@ class Camera:
     aspect_ratio = 16.0/9.0
     screen_width = 800
     screen_height = int(screen_width / aspect_ratio)
+    position = [0,0,0]
+    projection_matrix = glm.perspective(glm.radians(60), 16/9, 0.1, 100.0)
 
-    viewport_height = 0
-    viewport_width = 0
+    eye_to_world_matrix = glm.mat4x4()
 
-    pixel_delta_u = 0
-    pixel_delta_v = 0
-
-    viewport_upper_left_center = [0.0,0.0,0.0]
-    position = glm.vec3(0,0,0)
-
-    def __init__(self, focal_length, position):
+    def __init__(self, focal_length):
         self.focal_length = focal_length
-        self.position = position
     
-    def configure_viewport(self, viewport_height):
-        self.viewport_height = viewport_height
-        self.viewport_width = viewport_height * (self.screen_width / self.screen_height)
-        viewport_u = glm.vec3(self.viewport_width, 0.0, 0.0)
-        viewport_v = glm.vec3(0.0, -self.viewport_height, 0.0)
-        self.pixel_delta_u = viewport_u / self.screen_width
-        self.pixel_delta_v = viewport_v / self.screen_height
-
-        viewport_upper_left = self.position - glm.vec3(0.0, 0.0, self.focal_length) - (viewport_u / 2.0) - (viewport_v / 2.0)
-        self.viewport_upper_left_center = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v) 
+    def setupmatrix(self,position, target):
+        self.position = position
+        view_matrix = glm.lookAt(position, target, [0,1,0])
+        self.eye_to_world_matrix = glm.inverse(view_matrix)
 
     def save_image(self,image):
         rgb_image = (np.clip(image, 0.0,1.0) * 255.0).astype(np.uint8)
         new_image = Image.fromarray(rgb_image)
         new_image.save('image_with.png')
 
-    def antialising(self,pixel_center, nb_samples, objects):
+    def shadowing(self, lightPos, point, objects, current_obj):
+        ray_dir = point - lightPos
+        r = ray.Ray(lightPos, ray_dir)
+        for o in objects:
+            t = o.hit(r)
+            if t == None or current_obj == o:
+                continue
+            elif t > 0 and t < 1:
+                return True
+        return False
+
+    def antialising(self,pixel_center, nb_samples, objects, lightPos):
         color = np.array([0.0,0.0,0.0])
         for i in range(nb_samples):
-            new_point = pixel_center + (random.random() - 0.5) * self.pixel_delta_u + (random.random() - 0.5) * self.pixel_delta_v
+            #new_point = pixel_center + (random.random() - 0.5) * self.pixel_delta_u + (random.random() - 0.5) * self.pixel_delta_v
+            '''
             ray_direction = glm.normalize(new_point - self.position)
             r = ray.Ray(self.position, ray_direction)
+            '''
+            x = glm.clamp(pixel_center[0] + (random.random() - 0.5), 0, self.screen_width)
+            y = glm.clamp(pixel_center[1] + (random.random() - 0.5), 0, self.screen_height)
+            r = self.generate_ray_with_matrix(x, y)
             min = sys.float_info.max
             minObj = None
             for o in objects:
@@ -59,20 +64,37 @@ class Camera:
                     min = o.hit(r)
                     minObj = o
             if(minObj != None):
-                color += np.array(minObj.getColor())
-        return np.array(color)/nb_samples
+                p = r.ray_cast(min)
+                if self.shadowing(lightPos, p, objects, minObj):
+                    color += np.array([0,0,0])
+                else:
+                    normal = glm.normalize(minObj.getNormal(p))
+                    light_dir = glm.normalize(lightPos - p)
+                    color += np.array(minObj.getColor()) * glm.dot(light_dir, normal)
+        return np.array(color) / nb_samples
 
-    def render_image(self, objects: list[Object]):
+    def generate_ray_with_matrix(self, i, j):
+        pixel_normalize_x = (2.0 * i / self.screen_width) - 1.0
+        pixel_normalize_y = 1.0 - (2.0 * j / self.screen_height)
+
+        # point dans l'espace camera
+        ray_eye = glm.vec4(pixel_normalize_x * self.aspect_ratio, pixel_normalize_y, -self.focal_length, 1.0)
+
+        # camera to world
+        ray_world_space = self.eye_to_world_matrix * ray_eye
+        ray_dir = glm.normalize(ray_world_space.xyz - self.position)
+
+        return ray.Ray(self.position, ray_dir)
+
+    def render_image(self, objects):
         print("Rendering ....")
         print(self.screen_height)
         print(self.screen_width)
-        image = np.zeros((int(self.screen_height), int(self.screen_width), 3), dtype=np.int8)
+        image = np.zeros((int(self.screen_height), int(self.screen_width), 3), dtype=np.float32)
         for j in range(self.screen_height):
             for i in range(self.screen_width):
-                pixel_center = self.viewport_upper_left_center + (i * self.pixel_delta_u) + (j * self.pixel_delta_v)
                 color = [0.0,0.0,0.0]
-                color = self.antialising(pixel_center, 20, objects)
+                color = self.antialising([i,j], 20, objects, glm.vec3(-1, 2, -0.5))
                 image[j,i] = color
-                #image[j,i] = color
         
         self.save_image(image)

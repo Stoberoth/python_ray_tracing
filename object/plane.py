@@ -26,7 +26,9 @@ class Plane(Object):
             else:
                 return None
         '''
-        t = glm.dot((self.attach_point - r.origin), self.normal) / glm.dot(r.dir, self.normal)
+        t = -1
+        if glm.dot(r.dir, self.normal) != 0:
+            t = glm.dot((self.attach_point - r.origin), self.normal) / glm.dot(r.dir, self.normal)
         if(t >=0 ): 
             return t
         return None
@@ -34,3 +36,7 @@ class Plane(Object):
     def getColor(self):
         super().getColor()
         return self.color
+
+    def getNormal(self, point):
+        super().getNormal(point)
+        return self.normal

@@ -7,7 +7,7 @@ class Object(ABC):
         pass
 
     @abstractmethod
-    def getColor(self):
+    def getColor(self, light, hitPoint, camera):
         pass
     
     @abstractmethod

@@ -2,6 +2,7 @@ import sys
 from object.object import Object
 from pyglm import glm
 import ray
+import numpy as np
 
 class Plane(Object):
     attach_point = glm.vec3(0.0,0.0,0.0)
@@ -33,9 +34,9 @@ class Plane(Object):
             return t
         return None
 
-    def getColor(self):
-        super().getColor()
-        return self.color
+    def getColor(self, light, hitPoint, camera):
+        super().getColor(light, hitPoint, camera)
+        return np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.normal)
 
     def getNormal(self, point):
         super().getNormal(point)

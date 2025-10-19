@@ -4,7 +4,9 @@ import sys
 from turtle import position
 from pyglm import glm
 
+from lighting import BlinnPhong
 from object.object import Object
+import light
 import ray
 import numpy as np
 from PIL import Image
@@ -46,7 +48,7 @@ class Camera:
                 return True
         return False
 
-    def antialising(self,pixel_center, nb_samples, objects, lightPos):
+    def antialising(self,pixel_center, nb_samples, objects, light):
         color = np.array([0.0,0.0,0.0])
         for i in range(nb_samples):
             #new_point = pixel_center + (random.random() - 0.5) * self.pixel_delta_u + (random.random() - 0.5) * self.pixel_delta_v
@@ -65,12 +67,12 @@ class Camera:
                     minObj = o
             if(minObj != None):
                 p = r.ray_cast(min)
-                if self.shadowing(lightPos, p, objects, minObj):
+                if self.shadowing(light.getPosition(), p, objects, minObj):
                     color += np.array([0,0,0])
                 else:
                     normal = glm.normalize(minObj.getNormal(p))
-                    light_dir = glm.normalize(lightPos - p)
-                    color += np.array(minObj.getColor()) * glm.dot(light_dir, normal)
+                    color += np.array(minObj.getColor(light, p, self))
+                    #color += BlinnPhong(p, lightPos, p, normal, minObj.getColor())
         return np.array(color) / nb_samples
 
     def generate_ray_with_matrix(self, i, j):
@@ -86,7 +88,7 @@ class Camera:
 
         return ray.Ray(self.position, ray_dir)
 
-    def render_image(self, objects):
+    def render_image(self, objects: Object, light: light.Light):
         print("Rendering ....")
         print(self.screen_height)
         print(self.screen_width)
@@ -94,7 +96,7 @@ class Camera:
         for j in range(self.screen_height):
             for i in range(self.screen_width):
                 color = [0.0,0.0,0.0]
-                color = self.antialising([i,j], 20, objects, glm.vec3(-1, 2, -0.5))
+                color = self.antialising([i,j], 20, objects, light)
                 image[j,i] = color
         
         self.save_image(image)

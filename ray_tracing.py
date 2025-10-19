@@ -5,12 +5,15 @@ import numpy as np
 from camera import Camera
 from object.plane import Plane
 from object.sphere import Sphere
+import light
 import ray
+
+direction_light = light.Light(glm.vec3(0, 2, 3), glm.vec3(1.0,1.0,1.0))
 
 camera = Camera(focal_length=1)
 camera.setupmatrix(position=[0.0,0.0,0.0], target=glm.vec3(0,0,1))
 
-s = Sphere(glm.vec3(0,0,4), 1, [1.0,1.0,1.0])
+s = Sphere(glm.vec3(0,0,4), 1, [0.5,0.5,0.5])
 #s1 = Sphere(glm.vec3(2,0,4), 1, [0.5,0.5,0.5])
 
 p1 = Plane(glm.vec3(505,0,0), glm.vec3(-1,0,0),[1.0,0.0,0.0])
@@ -43,7 +46,7 @@ l.append(p5)
 l.append(p6)
 
 
-camera.render_image(l)
+camera.render_image(l, direction_light)
 
 
 

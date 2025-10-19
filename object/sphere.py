@@ -1,6 +1,8 @@
 import sys
 
 from numpy.core.defchararray import center
+from camera import Camera
+from lighting import BlinnPhong
 from object.object import Object
 import ray
 from pyglm import glm
@@ -38,12 +40,14 @@ class Sphere(Object):
         else:
             return None
 
-    def getColor(self):
-        super().getColor()
-        return self.color
+    def getColor(self, light, hitPoint, camera: Camera):
+        super().getColor(light, hitPoint, camera)
+        color = np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.getNormal(hitPoint))
+        color = BlinnPhong(hitPoint, light, glm.normalize(glm.vec3(np.array(camera.position) - hitPoint)), self.getNormal(hitPoint), self.color)
+        return color
 
     def getNormal(self, point):
         super().getNormal(point)
-        return np.array(point) - np.array(self.center)
+        return glm.normalize(np.array(point) - np.array(self.center))
     
     

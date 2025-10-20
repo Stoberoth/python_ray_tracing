@@ -71,7 +71,7 @@ class Camera:
                     color += np.array([0,0,0])
                 else:
                     normal = glm.normalize(minObj.getNormal(p))
-                    color += np.array(minObj.getColor(light, p, self))
+                    color += np.array(minObj.getColor(light, p, self, r))
                     #color += BlinnPhong(p, lightPos, p, normal, minObj.getColor())
         return np.array(color) / nb_samples
 
@@ -96,7 +96,7 @@ class Camera:
         for j in range(self.screen_height):
             for i in range(self.screen_width):
                 color = [0.0,0.0,0.0]
-                color = self.antialising([i,j], 20, objects, light)
+                color = self.antialising([i,j], 1, objects, light)
                 image[j,i] = color
         
         self.save_image(image)

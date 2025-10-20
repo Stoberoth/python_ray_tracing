@@ -13,12 +13,14 @@ class Sphere(Object):
     center = glm.vec3(0.0,0.0,0.0)
     radius = 1.0
     color = [0,0,0]
+    object_material = None
 
-    def __init__(self, center, radius, color):
+    def __init__(self, center, radius, mat):
         super().__init__()
         self.center = center
         self.radius = radius
-        self.color = color
+        self.object_material = mat
+        self.object_material.obj = self
         
     
     def hit(self, ray: ray.Ray):
@@ -40,10 +42,11 @@ class Sphere(Object):
         else:
             return None
 
-    def getColor(self, light, hitPoint, camera: Camera):
+    def getColor(self, light, hitPoint, camera: Camera, r):
         super().getColor(light, hitPoint, camera)
-        color = np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.getNormal(hitPoint))
-        color = BlinnPhong(hitPoint, light, glm.normalize(glm.vec3(np.array(camera.position) - hitPoint)), self.getNormal(hitPoint), self.color)
+        #color = np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.getNormal(hitPoint))
+        #color = BlinnPhong(hitPoint, light, glm.normalize(glm.vec3(np.array(camera.position) - hitPoint)), self.getNormal(hitPoint), self.color)
+        color = self.object_material.computeColor(hitPoint, r)
         return color
 
     def getNormal(self, point):

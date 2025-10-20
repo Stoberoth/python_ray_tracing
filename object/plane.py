@@ -7,13 +7,14 @@ import numpy as np
 class Plane(Object):
     attach_point = glm.vec3(0.0,0.0,0.0)
     normal = glm.vec3(0.0,0.0,0.0)
-    color = [0.0,1.0,0.0]
+    mat = None
 
-    def __init__(self, attach_point, normal, color) :
+    def __init__(self, attach_point, normal, mat) :
         super().__init__()
         self.attach_point = attach_point
         self.normal = normal
-        self.color = color
+        self.mat = mat
+        self.mat.obj = self
 
     def hit(self, r: ray.Ray):
         super().hit(r)
@@ -34,9 +35,9 @@ class Plane(Object):
             return t
         return None
 
-    def getColor(self, light, hitPoint, camera):
+    def getColor(self, light, hitPoint, camera,r):
         super().getColor(light, hitPoint, camera)
-        return np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.normal)
+        return self.mat.computeColor(hitPoint, r)
 
     def getNormal(self, point):
         super().getNormal(point)

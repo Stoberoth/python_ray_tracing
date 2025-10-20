@@ -3,6 +3,7 @@ from camera import Camera
 import light
 from materials.basic_material import BasicMaterial
 from materials.blinn_phong_material import BlinnPhongMaterial
+from materials.reflective_material import ReflectiveMaterial
 from object.plane import Plane
 from object.sphere import Sphere
 
@@ -29,9 +30,11 @@ p1 = Plane(glm.vec3(505,0,0), glm.vec3(-1,0,0),BasicMaterial([1.0,0.0,0.0]))
 #p2 = Plane(glm.vec3(-505,0,0), glm.vec3(1,0,0),BasicMaterial([0.0,0.0,1.0]))
 p2 = Plane(glm.vec3(-505,0,0), glm.vec3(1,0,0),BlinnPhongMaterial(color=[0.0,0.0,1.0]))
 p3 = Plane(glm.vec3(0,505,0), glm.vec3(0,-1,0),BasicMaterial([1.0,0.0,1.0]))
-p4 = Plane(glm.vec3(0,-505,0), glm.vec3(0,1,0),BasicMaterial([1.0,1.0,0.0]))
+p4 = Plane(glm.vec3(0,-2,0), glm.vec3(0,1,0),ReflectiveMaterial())
+#p4 = Plane(glm.vec3(0,-505,0), glm.vec3(0,1,0),BasicMaterial([1.0,1.0,.0]))
 p5 = Plane(glm.vec3(0,0,-600), glm.vec3(0,0,1),BasicMaterial([0.0,1.0,1.0]))
-p6 = Plane(glm.vec3(0,0,600), glm.vec3(0,0,-1),BasicMaterial([0.0,1.0,0.0]))
+#p6 = Plane(glm.vec3(0,0,600), glm.vec3(0,0,-1),BasicMaterial([0.0,1.0,0.0]))
+p6 = Plane(glm.vec3(0,0,600), glm.vec3(0,0,-1),ReflectiveMaterial())
 
 list_of_objects.append(s)
 #l.append(s1)

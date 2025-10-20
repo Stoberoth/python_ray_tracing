@@ -5,6 +5,7 @@ from turtle import position
 from pyglm import glm
 
 from lighting import BlinnPhong
+from materials.reflective_material import ReflectiveMaterial
 from object.object import Object
 import light
 import ray
@@ -67,10 +68,10 @@ class Camera:
                     minObj = o
             if(minObj != None):
                 p = r.ray_cast(min)
-                if self.shadowing(light.getPosition(), p, objects, minObj):
+                if type(minObj.mat) != ReflectiveMaterial and self.shadowing(light.getPosition(), p, objects, minObj):
                     color += np.array([0,0,0])
                 else:
-                    normal = glm.normalize(minObj.getNormal(p))
+                    #normal = glm.normalize(minObj.getNormal(p))
                     color += np.array(minObj.getColor(light, p, self, r))
                     #color += BlinnPhong(p, lightPos, p, normal, minObj.getColor())
         return np.array(color) / nb_samples

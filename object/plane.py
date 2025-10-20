@@ -7,7 +7,6 @@ import numpy as np
 class Plane(Object):
     attach_point = glm.vec3(0.0,0.0,0.0)
     normal = glm.vec3(0.0,0.0,0.0)
-    mat = None
 
     def __init__(self, attach_point, normal, mat) :
         super().__init__()

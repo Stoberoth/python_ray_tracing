@@ -2,6 +2,7 @@ from random import randrange
 import random
 import sys
 from turtle import position
+from types import NoneType
 from pyglm import glm
 
 from lighting import BlinnPhong
@@ -36,18 +37,9 @@ class Camera:
     def save_image(self,image):
         rgb_image = (np.clip(image, 0.0,1.0) * 255.0).astype(np.uint8)
         new_image = Image.fromarray(rgb_image)
-        new_image.save('image_with.png')
+        new_image.save('image_shadow_on_miror.png')
 
-    def shadowing(self, lightPos, point, objects, current_obj):
-        ray_dir = point - lightPos
-        r = ray.Ray(lightPos, ray_dir)
-        for o in objects:
-            t = o.hit(r)
-            if t == None or current_obj == o:
-                continue
-            elif t > 0 and t < 1:
-                return True
-        return False
+  
 
     def antialising(self,pixel_center, nb_samples, objects, light):
         color = np.array([0.0,0.0,0.0])
@@ -68,12 +60,10 @@ class Camera:
                     minObj = o
             if(minObj != None):
                 p = r.ray_cast(min)
-                if type(minObj.mat) != ReflectiveMaterial and self.shadowing(light.getPosition(), p, objects, minObj):
-                    color += np.array([0,0,0])
-                else:
-                    #normal = glm.normalize(minObj.getNormal(p))
-                    color += np.array(minObj.getColor(light, p, self, r))
-                    #color += BlinnPhong(p, lightPos, p, normal, minObj.getColor())
+                #normal = glm.normalize(minObj.getNormal(p))
+                if(type(minObj.getColor(light, p, self, r, 0)) != NoneType):
+                    color += np.array(minObj.getColor(light, p, self, r, 0))
+                #color += BlinnPhong(p, lightPos, p, normal, minObj.getColor())
         return np.array(color) / nb_samples
 
     def generate_ray_with_matrix(self, i, j):
@@ -96,8 +86,7 @@ class Camera:
         image = np.zeros((int(self.screen_height), int(self.screen_width), 3), dtype=np.float32)
         for j in range(self.screen_height):
             for i in range(self.screen_width):
-                color = [0.0,0.0,0.0]
-                color = self.antialising([i,j], 1, objects, light)
+                color = self.antialising([i,j], 10, objects, light)
                 image[j,i] = color
         
         self.save_image(image)

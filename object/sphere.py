@@ -41,11 +41,11 @@ class Sphere(Object):
         else:
             return None
 
-    def getColor(self, light, hitPoint, camera: Camera, r):
-        super().getColor(light, hitPoint, camera)
+    def getColor(self, light, hitPoint, camera: Camera, r, depth):
+        super().getColor(light, hitPoint, camera, depth)
         #color = np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.getNormal(hitPoint))
         #color = BlinnPhong(hitPoint, light, glm.normalize(glm.vec3(np.array(camera.position) - hitPoint)), self.getNormal(hitPoint), self.color)
-        color = self.mat.computeColor(hitPoint, r)
+        color = self.mat.computeColor(hitPoint, r, depth)
         return color
 
     def getNormal(self, point):

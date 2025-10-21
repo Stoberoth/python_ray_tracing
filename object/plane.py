@@ -34,9 +34,9 @@ class Plane(Object):
             return t
         return None
 
-    def getColor(self, light, hitPoint, camera,r):
-        super().getColor(light, hitPoint, camera)
-        return self.mat.computeColor(hitPoint, r)
+    def getColor(self, light, hitPoint, camera,r, depth):
+        super().getColor(light, hitPoint, camera, depth)
+        return self.mat.computeColor(hitPoint, r, depth)
 
     def getNormal(self, point):
         super().getNormal(point)

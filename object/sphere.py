@@ -29,17 +29,18 @@ class Sphere(Object):
         b = 2.0 * glm.dot(ray.dir, oc)
         c = glm.dot(oc, oc) - self.radius * self.radius
         discriminant = b*b-4*a*c
+        hits = discriminant
         if(discriminant >=0):
             x1 = (-b+math.sqrt(discriminant))/(2*a)
             x2 = (-b-math.sqrt(discriminant))/(2*a)
             if x2 < 0 and x1 < 0:
-                return None
-            elif x2 < 0:
-                return x1
+                return None, None
+            elif x2 <= 0:
+                return x1, hits
             else:
-                return x2
+                return x2, hits
         else:
-            return None
+            return None, None
 
     def getColor(self, light, hitPoint, camera: Camera, r, depth):
         super().getColor(light, hitPoint, camera, depth)

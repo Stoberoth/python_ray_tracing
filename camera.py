@@ -55,8 +55,9 @@ class Camera:
             min = sys.float_info.max
             minObj = None
             for o in objects:
-                if o.hit(r) != None and min > o.hit(r):
-                    min = o.hit(r)
+                t, discriminant = o.hit(r)
+                if t != None and t < min:
+                    min, discriminant = o.hit(r)
                     minObj = o
             if(minObj != None):
                 p = r.ray_cast(min)
@@ -86,7 +87,7 @@ class Camera:
         image = np.zeros((int(self.screen_height), int(self.screen_width), 3), dtype=np.float32)
         for j in range(self.screen_height):
             for i in range(self.screen_width):
-                color = self.antialising([i,j], 10, objects, light)
+                color = self.antialising([i,j], 1, objects, light)
                 image[j,i] = color
         
         self.save_image(image)

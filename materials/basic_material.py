@@ -14,6 +14,7 @@ class BasicMaterial(Material):
         from scene import direction_light, list_of_objects
         super().computeColor(hitPoint, ray, depth)
         if direction_light.is_in_shadow(hitPoint, self.obj):
-            return np.array([0,0,0])
+            ambient = 0.2
+            return np.array(self.color) * ambient
         return np.array(self.color) * glm.dot(glm.normalize(direction_light.position - hitPoint), self.obj.getNormal(hitPoint))
 

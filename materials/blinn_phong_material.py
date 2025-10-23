@@ -21,7 +21,7 @@ class BlinnPhongMaterial(Material):
         from scene import direction_light, camera, list_of_objects
         super().computeColor(hitPoint, ray, depth)
         if direction_light.is_in_shadow(hitPoint, self.obj):
-            return np.array([0,0,0])
+            return self.ambient_scale * self.color
         else:
             ambient = self.ambient_scale * direction_light.color
 

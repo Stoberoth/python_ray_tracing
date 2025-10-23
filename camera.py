@@ -5,13 +5,14 @@ from turtle import position
 from types import NoneType
 from pyglm import glm
 
-from lighting import BlinnPhong
 from materials.reflective_material import ReflectiveMaterial
 from object.object import Object
 import light
 import ray
 import numpy as np
 from PIL import Image
+
+from progress.bar import Bar
 
 
 class Camera:
@@ -55,15 +56,15 @@ class Camera:
             min = sys.float_info.max
             minObj = None
             for o in objects:
-                t, discriminant = o.hit(r)
+                t = o.hit(r)
                 if t != None and t < min:
-                    min, discriminant = o.hit(r)
+                    min = o.hit(r)
                     minObj = o
             if(minObj != None):
                 p = r.ray_cast(min)
                 #normal = glm.normalize(minObj.getNormal(p))
-                if(type(minObj.getColor(light, p, self, r, 0)) != NoneType):
-                    color += np.array(minObj.getColor(light, p, self, r, 0))
+                if(type(minObj.getColor( p, r, 0)) != NoneType):
+                    color += np.array(minObj.getColor( p, r, 0))
                 #color += BlinnPhong(p, lightPos, p, normal, minObj.getColor())
         return np.array(color) / nb_samples
 
@@ -85,9 +86,11 @@ class Camera:
         print(self.screen_height)
         print(self.screen_width)
         image = np.zeros((int(self.screen_height), int(self.screen_width), 3), dtype=np.float32)
-        for j in range(self.screen_height):
-            for i in range(self.screen_width):
-                color = self.antialising([i,j], 1, objects, light)
-                image[j,i] = color
-        
+        with Bar("Rendering", fill="-", suffix="%(percent).1f%% - %(eta)ds") as bar:
+            for j in range(self.screen_height):
+                for i in range(self.screen_width):
+                    color = self.antialising([i,j], 1, objects, light)
+                    image[j,i] = color
+                bar.next()    
+        print("Savegarde en cours ...")
         self.save_image(image)

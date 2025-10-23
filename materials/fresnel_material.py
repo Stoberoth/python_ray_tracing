@@ -7,6 +7,7 @@ from materials.material import Material
 
 from ray import Ray
 
+# TODO : ajouter le calcul des coefficient de fresnel pour avoir le ratio refraction reflexion
 
 class FresnelMaterial(Material):
     obj = None
@@ -17,14 +18,11 @@ class FresnelMaterial(Material):
         self.color = color
         self.refract_index = refract_index
 
-    def shadowing(self, lightPos, point, objects, current_obj):
-        return super().shadowing(lightPos, point, objects, current_obj)
-
     def computeColor(self, hitPoint, ray, depth):
         super().computeColor(hitPoint, ray, depth)
         from scene import max_depth, list_of_objects, direction_light
         normal = self.obj.getNormal(hitPoint)
-        entering = glm.dot(ray.dir, normal) < 0
+        entering = glm.dot(glm.normalize(ray.dir), normal) < 0
         if entering:
             n1_over_n2 = 1.0/self.refract_index
             offset_normal = -normal
@@ -33,10 +31,10 @@ class FresnelMaterial(Material):
             normal = -normal
             offset_normal = -normal
         if depth <= max_depth:
-            hit, hits = self.obj.hit(ray)       
+            hit = self.obj.hit(ray)       
             #k = 1.0 - 1.0*(1.0 - glm.dot(self.obj.getNormal(hitPoint), ray.dir) * glm.dot(self.obj.getNormal(hitPoint), ray.dir))
             #R = 1.0 * ray.dir - (1.0 * glm.dot(self.obj.getNormal(hitPoint), ray.dir + math.sqrt(k)) * self.obj.getNormal(hitPoint))
-            R = glm.refract(ray.dir, normal, n1_over_n2)
+            R = glm.refract(glm.normalize(ray.dir), normal, n1_over_n2)
             #if refracted_dir[0] < sys.float_info.epsilon and refracted_dir[1] < sys.float_info.epsilon and refracted_dir[2] < sys.float_info.epsilon:
             #    return None
             refracted_ray = Ray(hitPoint + offset_normal * 0.00001, R)
@@ -44,14 +42,14 @@ class FresnelMaterial(Material):
             min = sys.float_info.max
             minObj = None
             for object in list_of_objects:
-                hit, hits = object.hit(refracted_ray)
+                hit = object.hit(refracted_ray)
                 if hit != None and min > hit:
                     min = hit
                     minObj = object
             if minObj != None:
                 p = refracted_ray.ray_cast(min)
                 #color = self.color * minObj.getColor(direction_light,p, self, refracted_ray, depth +1)
-                color = self.color * minObj.getColor(direction_light,p, self, refracted_ray, depth +1)
+                color = self.color * minObj.getColor(p, refracted_ray, depth +1)
                 return color
         return None
 

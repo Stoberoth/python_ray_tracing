@@ -2,12 +2,13 @@ import sys
 
 from numpy.core.defchararray import center
 from camera import Camera
-from lighting import BlinnPhong
 from object.object import Object
 import ray
 from pyglm import glm
 import math
 import numpy as np
+
+# TODO : avoir une correction du hitPoint pour la refraction ici ou dans le materiel à voir
 
 class Sphere(Object):
     center = glm.vec3(0.0,0.0,0.0)
@@ -25,25 +26,24 @@ class Sphere(Object):
     def hit(self, ray: ray.Ray):
         super().hit(ray)
         oc = glm.vec3(ray.origin - self.center)
-        a = glm.dot(ray.dir, ray.dir)
+        a = glm.dot(ray.dir,(ray.dir))
         b = 2.0 * glm.dot(ray.dir, oc)
         c = glm.dot(oc, oc) - self.radius * self.radius
         discriminant = b*b-4*a*c
-        hits = discriminant
         if(discriminant >=0):
             x1 = (-b+math.sqrt(discriminant))/(2*a)
             x2 = (-b-math.sqrt(discriminant))/(2*a)
             if x2 < 0 and x1 < 0:
-                return None, None
+                return None
             elif x2 <= 0:
-                return x1, hits
+                return x1
             else:
-                return x2, hits
+                return x2
         else:
-            return None, None
+            return None
 
-    def getColor(self, light, hitPoint, camera: Camera, r, depth):
-        super().getColor(light, hitPoint, camera, depth)
+    def getColor(self, hitPoint, r, depth):
+        super().getColor(hitPoint, depth)
         #color = np.array(self.color) * glm.dot(glm.normalize(light.getPosition() - hitPoint), self.getNormal(hitPoint))
         #color = BlinnPhong(hitPoint, light, glm.normalize(glm.vec3(np.array(camera.position) - hitPoint)), self.getNormal(hitPoint), self.color)
         color = self.mat.computeColor(hitPoint, r, depth)

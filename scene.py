@@ -19,11 +19,11 @@ global max_depth
 max_depth = 10
 
 global direction_light
-direction_light = light.Light(glm.vec3(0, 2, 3), glm.vec3(1.0,1.0,1.0))
+direction_light = light.Light(glm.vec3(0, 2, 2), glm.vec3(1.0,1.0,1.0))
 
 global camera
 camera = Camera(focal_length=1)
-camera.setupmatrix(position=[0.0,0.0,-7.0], target=glm.vec3(0,0,1))
+camera.setupmatrix(position=[0.0,0.0,0.0], target=glm.vec3(0,0,1))
 
 
 s = Sphere(glm.vec3(0,0,4), 1, ReflectiveMaterial())
@@ -36,8 +36,8 @@ p3 = Plane(glm.vec3(0,3,0), glm.vec3(0,-1,0),BasicMaterial([1.0,0.0,1.0]))
 #p3 = Plane(glm.vec3(0,5,0), glm.vec3(0,-1,0),BasicMaterial([1.0,0.0,1.0]))
 #p4 = Plane(glm.vec3(0,-3,0), glm.vec3(0,1,0),ReflectiveMaterial())
 p4 = Plane(glm.vec3(0,-3,0), glm.vec3(0,1,0),BasicMaterial([1.0,1.0,.0]))
-#p5 = Plane(glm.vec3(0,0,-5), glm.vec3(0,0,1),BasicMaterial([0.0,1.0,1.0]))
-p5 = Plane(glm.vec3(0,0,-5), glm.vec3(0,0,1),FresnelMaterial(refract_index=1.0,color=[1.0,1.0,1.0]))
+p5 = Plane(glm.vec3(0,0,-5), glm.vec3(0,0,1),BasicMaterial([0.0,1.0,1.0]))
+#p5 = Plane(glm.vec3(0,0,-5), glm.vec3(0,0,1),FresnelMaterial(refract_index=1.0,color=[1.0,1.0,1.0]))
 p6 = Plane(glm.vec3(0,0,5), glm.vec3(0,0,-1),BasicMaterial([0.0,1.0,0.0]))
 #p6 = Plane(glm.vec3(0,0,5), glm.vec3(0,0,-1),ReflectiveMaterial())
 

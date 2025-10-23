@@ -6,7 +6,7 @@ class Ray:
 
     def __init__(self, origin, dir):
         self.origin = origin
-        self.dir = glm.normalize(dir)
+        self.dir = dir
 
     def get_origin(self):
         return self.origin

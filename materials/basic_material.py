@@ -10,13 +10,10 @@ class BasicMaterial(Material):
         super().__init__()
         self.color = color
 
-    def shadowing(self, lightPos, point, objects, current_obj):
-        return super().shadowing(lightPos, point, objects, current_obj)
-
     def computeColor(self, hitPoint, ray, depth):
         from scene import direction_light, list_of_objects
         super().computeColor(hitPoint, ray, depth)
-        if self.shadowing(direction_light.getPosition(), hitPoint, list_of_objects, self.obj):
+        if direction_light.is_in_shadow(hitPoint, self.obj):
             return np.array([0,0,0])
         return np.array(self.color) * glm.dot(glm.normalize(direction_light.position - hitPoint), self.obj.getNormal(hitPoint))
 

@@ -21,8 +21,8 @@ class Plane(Object):
         if glm.dot(r.dir, self.normal) != 0:
             t = glm.dot((self.attach_point - r.origin), self.normal) / glm.dot(r.dir, self.normal)
         if(t >= 0): 
-            return t
-        return None
+            return t, self
+        return None, None
 
     def getColor(self, hitPoint,r, depth):
         super().getColor(hitPoint, depth)

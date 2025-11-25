@@ -16,8 +16,11 @@ class Light:
         # not normalize because I want to check if we arrive or not to the point we want
         light_ray = Ray(self.position, hitPoint - self.position)
         for obj in list_of_objects:
-            t = obj.hit(light_ray)
-            if t == None or check_obj == obj:
+            if check_obj.parent == obj:
+                continue
+            t, o = obj.hit(light_ray)
+            
+            if t == None or check_obj == obj :
                 continue
             elif t > 0.0 and t < 1.0 and type(obj.mat) != FresnelMaterial:
                 return True

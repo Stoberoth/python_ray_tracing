@@ -3,6 +3,7 @@ import ray
 
 class Object(ABC):
     mat = None
+    parent = None
     @abstractmethod
     def hit(self, r : ray.Ray):
         pass

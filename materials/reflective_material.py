@@ -22,10 +22,10 @@ class ReflectiveMaterial(Material):
             min = sys.float_info.max
             minObj = None
             for object in list_of_objects:
-                hit = object.hit(r)
+                hit, obj = object.hit(r)
                 if hit != None and min > hit and object != self.obj:
                     min = hit
-                    minObj = object
+                    minObj = obj
             if minObj != None:
                 p = r.ray_cast(min)
                 #if type(minObj.getColor(light, p, self, r, depth+1)) != NoneType:

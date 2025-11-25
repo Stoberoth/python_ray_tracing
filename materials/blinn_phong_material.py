@@ -15,7 +15,7 @@ class BlinnPhongMaterial(Material):
         self.ambient_scale = ambient_scale
         self.specular_strength = specular_strength
         self.specular_power = specular_power
-        self.color = color
+        self.color = glm.vec3(color)
 
     def computeColor(self, hitPoint, ray, depth):
         from scene import direction_light, camera, list_of_objects

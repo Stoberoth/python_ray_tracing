@@ -4,10 +4,12 @@ import sys
 from turtle import position
 from types import NoneType
 from pyglm import glm
+from sympy import Triangle
 
 from materials.reflective_material import ReflectiveMaterial
 from object.object import Object
 import light
+from octree import Octree
 import ray
 import numpy as np
 from PIL import Image
@@ -50,16 +52,20 @@ class Camera:
             ray_direction = glm.normalize(new_point - self.position)
             r = ray.Ray(self.position, ray_direction)
             '''
-            x = glm.clamp(pixel_center[0] + (random.random() - 0.5), 0, self.screen_width)
-            y = glm.clamp(pixel_center[1] + (random.random() - 0.5), 0, self.screen_height)
+            if nb_samples == 1:
+                x = pixel_center[0]
+                y = pixel_center[1]
+            else:
+                x = glm.clamp(pixel_center[0] + (random.random() - 0.5), 0, self.screen_width)
+                y = glm.clamp(pixel_center[1] + (random.random() - 0.5), 0, self.screen_height)
             r = self.generate_ray_with_matrix(x, y)
             min = sys.float_info.max
             minObj = None
             for o in objects:
-                t = o.hit(r)
+                t, obj = o.hit(r)
                 if t != None and t < min:
-                    min = o.hit(r)
-                    minObj = o
+                    min = t
+                    minObj = obj
             if(minObj != None):
                 p = r.ray_cast(min)
                 #normal = glm.normalize(minObj.getNormal(p))
@@ -89,8 +95,8 @@ class Camera:
         with Bar("Rendering", fill="-", suffix="%(percent).1f%% - %(eta)ds") as bar:
             for j in range(self.screen_height):
                 for i in range(self.screen_width):
-                    color = self.antialising([i,j], 1, objects, light)
+                    color = self.antialising([i,j], 8, objects, light)
                     image[j,i] = color
-                bar.next()    
+                bar.next(j/self.screen_height)    
         print("Savegarde en cours ...")
         self.save_image(image)
